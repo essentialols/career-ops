@@ -30,6 +30,9 @@ modes/_profile.md
 .update-dismissed
 .update-lock
 
+# Personal strategy and analysis docs (not part of open-source project)
+docs/strategy/
+
 # Secrets (never commit — use .env.example as template)
 .env
 
