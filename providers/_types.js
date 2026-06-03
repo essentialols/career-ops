@@ -13,11 +13,16 @@
  * Normalized job posting — the unit of currency throughout the scanner.
  *
  * @typedef {object} Job
- * @property {string} title    Required, non-empty after trim.
- * @property {string} url      Required, absolute URL — used as the dedup key.
- * @property {string} company  May be empty when the source can't expose it
- *                             at the list-page level; populated downstream.
- * @property {string} location May be empty.
+ * @property {string} title           Required, non-empty after trim.
+ * @property {string} url             Required, absolute URL — used as the dedup key.
+ * @property {string} company         May be empty when the source can't expose it
+ *                                    at the list-page level; populated downstream.
+ * @property {string} location        May be empty.
+ * @property {string} [publishedAt]   Optional ISO 8601 date string (e.g. '2025-01-15').
+ * @property {number} [salary]        Optional minimum salary value (currency-agnostic).
+ * @property {string} [workplaceType] Optional work arrangement (OnSite, Remote, Hybrid).
+ * @property {string} [employmentType] Optional employment type (FullTime, PartTime, Contract).
+ * @property {string} [description]   Optional full job description for keyword filtering.
  */
 
 /**

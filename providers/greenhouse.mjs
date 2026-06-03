@@ -35,6 +35,15 @@ function resolveApiUrl(entry) {
   return null;
 }
 
+// Extract minimum salary from Greenhouse's salary_range object.
+// Greenhouse returns {min, max, currency_code}; we extract the minimum.
+// Returns undefined if no salary data is available.
+function extractGreenhouseSalary(salaryRange) {
+  if (!salaryRange || typeof salaryRange !== 'object') return undefined;
+  if (salaryRange.min && typeof salaryRange.min === 'number') return salaryRange.min;
+  return undefined;
+}
+
 /** @type {Provider} */
 export default {
   id: 'greenhouse',
@@ -61,6 +70,11 @@ export default {
       url: j.absolute_url,
       company: entry.name,
       location: j.location?.name || '',
+      publishedAt: j.updated_at || j.created_at,
+      salary: extractGreenhouseSalary(j.salary_range),
+      workplaceType: j.workplace_type || undefined,
+      employmentType: j.employment_type || undefined,
+      description: j.description || j.content?.body || undefined,
     }));
   },
 };

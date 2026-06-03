@@ -23,6 +23,25 @@ function resolveApiUrl(entry) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Extract minimum salary from Ashby's compensationTierSummary object.
+// Ashby returns salary tiers with min/max values; we extract the lowest minimum.
+// Returns undefined if no salary data is available.
+function extractAshbySalary(compensationTierSummary) {
+  if (!compensationTierSummary || typeof compensationTierSummary !== 'object') return undefined;
+  const tiers = compensationTierSummary.tiers || compensationTierSummary.tier || [];
+  if (!Array.isArray(tiers) || tiers.length === 0) return undefined;
+
+  let minSalary = null;
+  for (const tier of tiers) {
+    if (tier.min && typeof tier.min === 'number') {
+      if (minSalary === null || tier.min < minSalary) {
+        minSalary = tier.min;
+      }
+    }
+  }
+  return minSalary;
+}
+
 /** @type {Provider} */
 export default {
   id: 'ashby',
@@ -51,6 +70,11 @@ export default {
           url: j.jobUrl || '',
           company: entry.name,
           location: j.location || '',
+          publishedAt: j.publishedAt,
+          salary: extractAshbySalary(j.compensationTierSummary),
+          workplaceType: j.workplaceType || undefined,
+          employmentType: j.employmentType || undefined,
+          description: j.description || undefined,
         }));
       } catch (e) {
         lastErr = e;

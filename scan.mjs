@@ -173,6 +173,185 @@ export function buildLocationFilter(locationFilter) {
   };
 }
 
+// ── Freshness filter ────────────────────────────────────────────────
+// Optional. If `freshness_filter` is absent from portals.yml, all jobs pass.
+// Jobs older than max_days (from today) are rejected.
+// Jobs with missing publishedAt dates are accepted (don't penalize missing data).
+
+export function buildFreshnessFilter(freshnessFilter) {
+  if (!freshnessFilter || !freshnessFilter.max_days) return () => true;
+  const maxDays = freshnessFilter.max_days;
+  const now = Date.now();
+
+  return (publishedAt) => {
+    if (!publishedAt || typeof publishedAt !== 'string') return true;
+    try {
+      const jobDate = new Date(publishedAt);
+      const ageMs = now - jobDate.getTime();
+      const ageDays = ageMs / (1000 * 60 * 60 * 24);
+      return ageDays <= maxDays;
+    } catch {
+      return true; // Unparseable dates pass (don't penalize malformed data)
+    }
+  };
+}
+
+// ── Salary filter ──────────────────────────────────────────────────
+// Optional. If `salary_filter` is absent from portals.yml, all jobs pass.
+// Jobs with salary < min_salary are rejected.
+// Jobs with missing salary data are accepted (don't penalize missing data).
+
+export function buildSalaryFilter(salaryFilter) {
+  if (!salaryFilter || !salaryFilter.min_salary) return () => true;
+  const minSalary = salaryFilter.min_salary;
+
+  return (salary) => {
+    if (salary == null) return true; // Missing salary always passes
+    const num = typeof salary === 'string' ? parseFloat(salary) : salary;
+    if (isNaN(num)) return true; // Unparseable salaries pass
+    return num >= minSalary;
+  };
+}
+
+// ── Workplace filter ────────────────────────────────────────────────
+// Optional. If `workplace_filter` is absent from portals.yml, all jobs pass.
+// Jobs with unrecognized workplace types are accepted (don't penalize missing data).
+// Matches case-insensitively against workplaceType (OnSite, Remote, Hybrid).
+
+export function buildWorkplaceFilter(workplaceFilter) {
+  if (!workplaceFilter || !Array.isArray(workplaceFilter.allow) || workplaceFilter.allow.length === 0) {
+    return () => true;
+  }
+  const allowed = new Set(workplaceFilter.allow.map(w => w.toLowerCase()));
+
+  return (workplaceType) => {
+    if (!workplaceType || typeof workplaceType !== 'string') return true;
+    return allowed.has(workplaceType.toLowerCase());
+  };
+}
+
+// ── Employment filter ──────────────────────────────────────────────
+// Optional. If `employment_filter` is absent from portals.yml, all jobs pass.
+// Jobs with unrecognized employment types are accepted (don't penalize missing data).
+// Matches case-insensitively against employmentType (FullTime, PartTime, Contract, etc.).
+
+export function buildEmploymentFilter(employmentFilter) {
+  if (!employmentFilter || !Array.isArray(employmentFilter.allow) || employmentFilter.allow.length === 0) {
+    return () => true;
+  }
+  const allowed = new Set(employmentFilter.allow.map(e => e.toLowerCase()));
+
+  return (employmentType) => {
+    if (!employmentType || typeof employmentType !== 'string') return true;
+    return allowed.has(employmentType.toLowerCase());
+  };
+}
+
+// ── Seniority filter ────────────────────────────────────────────────
+// Optional. If `seniority_filter` is absent from portals.yml, all jobs pass.
+// Minimum seniority level required: intern < entry < associate < mid_senior < director < executive.
+// Infers level from title keywords if explicit field is unavailable.
+
+function getSeniorityLevel(title) {
+  const lower = (title || '').toLowerCase();
+  if (lower.includes('executive') || lower.includes('c-level') || lower.includes('ceo') || lower.includes('cto') || lower.includes('cfo')) return 5;
+  if (lower.includes('director') || lower.includes('vp ')) return 4;
+  if (lower.includes('staff') || lower.includes('senior') || lower.includes('lead')) return 3;
+  if (lower.includes('mid') || lower.includes('intermediate')) return 3;
+  if (lower.includes('associate')) return 2;
+  if (lower.includes('entry') || lower.includes('junior')) return 1;
+  if (lower.includes('intern')) return 0;
+  return 2; // default to associate for unclassified titles
+}
+
+export function buildSeniorityFilter(seniorityFilter) {
+  if (!seniorityFilter || !seniorityFilter.min_level) return () => true;
+
+  const levelMap = {
+    'intern': 0,
+    'entry': 1,
+    'associate': 2,
+    'mid_senior': 3,
+    'director': 4,
+    'executive': 5,
+  };
+
+  const minLevel = levelMap[seniorityFilter.min_level];
+  if (minLevel === undefined) return () => true; // Invalid min_level → accept all
+
+  return (title) => {
+    const level = getSeniorityLevel(title);
+    return level >= minLevel;
+  };
+}
+
+// ── Description filter ──────────────────────────────────────────────
+// Optional. If `description_filter` is absent from portals.yml, all jobs pass.
+// require_any: job must match at least one keyword (case-insensitive substring).
+// exclude_any: if job matches any keyword, reject it.
+
+export function buildDescriptionFilter(descriptionFilter) {
+  if (!descriptionFilter) return () => true;
+
+  const requireAny = (descriptionFilter.require_any || []).map(k => k.toLowerCase());
+  const excludeAny = (descriptionFilter.exclude_any || []).map(k => k.toLowerCase());
+
+  if (requireAny.length === 0 && excludeAny.length === 0) return () => true;
+
+  return (description) => {
+    if (!description || typeof description !== 'string' || description.length < 50) {
+      // Missing or truncated description: always pass (don't penalize missing data)
+      return true;
+    }
+
+    const lower = description.toLowerCase();
+
+    // Check exclude_any first (hard reject)
+    if (excludeAny.length > 0 && excludeAny.some(k => lower.includes(k))) {
+      return false;
+    }
+
+    // Check require_any (soft accept if empty)
+    if (requireAny.length > 0) {
+      return requireAny.some(k => lower.includes(k));
+    }
+
+    return true;
+  };
+}
+
+// ── Early applicant filter ──────────────────────────────────────────
+// Optional. If `early_applicant_only` is true in portals.yml, only jobs
+// with earlyApplicant=true pass. Jobs without the field pass (don't penalize).
+
+export function buildEarlyApplicantFilter(flag) {
+  if (!flag) return () => true;
+  return (earlyApplicant) => {
+    if (earlyApplicant === undefined || earlyApplicant === null) return true;
+    return earlyApplicant === true;
+  };
+}
+
+// ── Company blocklist ──────────────────────────────────────────────
+// Optional. If `company_filter` is absent, all companies pass.
+// block: list of company name substrings to reject (case-insensitive).
+// allow: if non-empty, company must match at least one (allowlist mode).
+
+export function buildCompanyFilter(companyFilter) {
+  if (!companyFilter) return () => true;
+  const block = normalizeKeywordList(companyFilter.block);
+  const allow = normalizeKeywordList(companyFilter.allow);
+  if (block.length === 0 && allow.length === 0) return () => true;
+
+  return (company) => {
+    if (!company || typeof company !== 'string') return true;
+    const lower = company.toLowerCase();
+    if (block.length > 0 && block.some(k => lower.includes(k))) return false;
+    if (allow.length > 0) return allow.some(k => lower.includes(k));
+    return true;
+  };
+}
+
 // ── Dedup ───────────────────────────────────────────────────────────
 
 function loadSeenUrls() {
@@ -208,15 +387,24 @@ function loadSeenUrls() {
 
 function loadSeenCompanyRoles() {
   const seen = new Set();
+  // From applications tracker
   if (existsSync(APPLICATIONS_PATH)) {
     const text = readFileSync(APPLICATIONS_PATH, 'utf-8');
-    // Parse markdown table rows: | # | Date | Company | Role | ...
     for (const match of text.matchAll(/\|[^|]+\|[^|]+\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|/g)) {
       const company = match[1].trim().toLowerCase();
       const role = match[2].trim().toLowerCase();
       if (company && role && company !== 'company') {
         seen.add(`${company}::${role}`);
       }
+    }
+  }
+  // From pipeline (catches reposts of unprocessed jobs)
+  if (existsSync(PIPELINE_PATH)) {
+    const text = readFileSync(PIPELINE_PATH, 'utf-8');
+    for (const match of text.matchAll(/\|\s*([^|]+)\s*\|\s*([^|]+)\s*$/gm)) {
+      const company = match[1].trim().toLowerCase();
+      const role = match[2].trim().toLowerCase();
+      if (company && role) seen.add(`${company}::${role}`);
     }
   }
   return seen;
@@ -383,6 +571,7 @@ async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const verify = args.includes('--verify');
+  const linkedinOnly = args.includes('--linkedin-only');
   const companyFlag = args.indexOf('--company');
   const filterCompany = companyFlag !== -1 ? args[companyFlag + 1]?.toLowerCase() : null;
 
@@ -403,12 +592,20 @@ async function main() {
   const companies = config.tracked_companies || [];
   const titleFilter = buildTitleFilter(config.title_filter);
   const locationFilter = buildLocationFilter(config.location_filter);
+  const freshnessFilter = buildFreshnessFilter(config.freshness_filter);
+  const salaryFilter = buildSalaryFilter(config.salary_filter);
+  const workplaceFilter = buildWorkplaceFilter(config.workplace_filter);
+  const employmentFilter = buildEmploymentFilter(config.employment_filter);
+  const seniorityFilter = buildSeniorityFilter(config.seniority_filter);
+  const descriptionFilter = buildDescriptionFilter(config.description_filter);
+  const earlyApplicantFilter = buildEarlyApplicantFilter(config.early_applicant_only);
+  const companyFilter = buildCompanyFilter(config.company_filter);
 
   // 3. Resolve a provider for each enabled company
   const targets = [];
   let skippedCount = 0;
   const resolveErrors = [];
-  for (const company of companies) {
+  for (const company of (linkedinOnly ? [] : companies)) {
     if (!company || typeof company !== 'object') continue;
     if (company.enabled === false) continue;
     if (typeof company.name !== 'string' || !company.name.trim()) {
@@ -423,7 +620,23 @@ async function main() {
   }
 
   const localParserCount = targets.filter(t => t._provider.id === 'local-parser').length;
-  console.log(`Scanning ${targets.length} companies via providers (${localParserCount} local parser; ${skippedCount} skipped — no provider matched)`);
+
+  // 3b. Add linkedin_searches as targets (using linkedin provider)
+  const linkedinSearches = config.linkedin_searches || [];
+  const linkedinProvider = providers.get('linkedin');
+  if (linkedinProvider && linkedinSearches.length > 0) {
+    for (const search of linkedinSearches) {
+      if (!search || typeof search !== 'object') continue;
+      if (search.enabled === false) continue;
+      if (typeof search.name !== 'string' || !search.name.trim()) {
+        console.error(`Warning: Skipping linkedin_search entry — missing or non-string 'name' field: ${JSON.stringify(search)}`);
+        continue;
+      }
+      targets.push({ ...search, _provider: linkedinProvider, _isSearch: true });
+    }
+  }
+
+  console.log(`Scanning ${targets.length} companies via providers (${localParserCount} local parser; ${skippedCount} skipped, ${linkedinSearches.filter(s => s.enabled !== false).length} linkedin searches)`);
   if (dryRun) console.log('(dry run — no files will be written)\n');
 
   // 4. Load dedup sets
@@ -435,27 +648,38 @@ async function main() {
   let totalFound = 0;
   let totalFilteredTitle = 0;
   let totalFilteredLocation = 0;
+  let totalFilteredFreshness = 0;
+  let totalFilteredSalary = 0;
+  let totalFilteredWorkplace = 0;
+  let totalFilteredEmployment = 0;
+  let totalFilteredSeniority = 0;
+  let totalFilteredDescription = 0;
+  let totalFilteredEarlyApplicant = 0;
+  let totalFilteredCompany = 0;
   let totalDupes = 0;
   const newOffers = [];
   const errors = [...resolveErrors];
 
-  const tasks = targets.map(company => async () => {
-    let provider = company._provider;
+  const tasks = targets.map(target => async () => {
+    let provider = target._provider;
     const ctx = makeHttpCtx();
-    let sourceName = provider.id === 'local-parser' ? 'local-parser' : `${provider.id}-api`;
+    const isSearch = target._isSearch;
+    let sourceName = isSearch ? 'linkedin-search' : (provider.id === 'local-parser' ? 'local-parser' : `${provider.id}-api`);
     try {
       let jobs;
       try {
-        jobs = await provider.fetch(company, ctx);
+        // For linkedin searches, pass the search object directly
+        // For companies, pass the company object
+        jobs = await provider.fetch(target, ctx);
       } catch (parserErr) {
         if (provider.id !== 'local-parser') throw parserErr;
-        const fallback = resolveProvider(company, providers, { skipIds: ['local-parser'] });
+        const fallback = resolveProvider(target, providers, { skipIds: ['local-parser'] });
         if (!fallback || fallback.error) throw parserErr;
         provider = fallback.provider;
         sourceName = `${provider.id}-api`;
-        jobs = await provider.fetch(company, ctx);
+        jobs = await provider.fetch(target, ctx);
         errors.push({
-          company: company.name,
+          company: target.name,
           error: `local parser failed, used API fallback: ${parserErr.message}`,
         });
       }
@@ -473,6 +697,38 @@ async function main() {
           totalFilteredLocation++;
           continue;
         }
+        if (!freshnessFilter(job.publishedAt)) {
+          totalFilteredFreshness++;
+          continue;
+        }
+        if (!salaryFilter(job.salary)) {
+          totalFilteredSalary++;
+          continue;
+        }
+        if (!workplaceFilter(job.workplaceType)) {
+          totalFilteredWorkplace++;
+          continue;
+        }
+        if (!employmentFilter(job.employmentType)) {
+          totalFilteredEmployment++;
+          continue;
+        }
+        if (!seniorityFilter(job.title)) {
+          totalFilteredSeniority++;
+          continue;
+        }
+        if (!descriptionFilter(job.description)) {
+          totalFilteredDescription++;
+          continue;
+        }
+        if (!companyFilter(job.company)) {
+          totalFilteredCompany++;
+          continue;
+        }
+        if (!earlyApplicantFilter(job.earlyApplicant)) {
+          totalFilteredEarlyApplicant++;
+          continue;
+        }
         if (seenUrls.has(job.url)) {
           totalDupes++;
           continue;
@@ -488,7 +744,7 @@ async function main() {
         newOffers.push({ ...job, source: sourceName });
       }
     } catch (err) {
-      errors.push({ company: company.name, error: err.message });
+      errors.push({ company: target.name, error: err.message });
     }
   });
 
@@ -539,12 +795,20 @@ async function main() {
 
   // 7. Print summary
   console.log(`\n${'━'.repeat(45)}`);
-  console.log(`Portal Scan — ${date}`);
+  console.log(`Portal Scan - ${date}`);
   console.log(`${'━'.repeat(45)}`);
   console.log(`Companies scanned:     ${targets.length}`);
   console.log(`Total jobs found:      ${totalFound}`);
   console.log(`Filtered by title:     ${totalFilteredTitle} removed`);
   console.log(`Filtered by location:  ${totalFilteredLocation} removed`);
+  console.log(`Filtered by freshness: ${totalFilteredFreshness} removed`);
+  console.log(`Filtered by salary:    ${totalFilteredSalary} removed`);
+  console.log(`Filtered by workplace: ${totalFilteredWorkplace} removed`);
+  console.log(`Filtered by employment: ${totalFilteredEmployment} removed`);
+  console.log(`Filtered by seniority: ${totalFilteredSeniority} removed`);
+  console.log(`Filtered by description: ${totalFilteredDescription} removed`);
+  console.log(`Filtered by company:   ${totalFilteredCompany} removed`);
+  console.log(`Filtered by early app: ${totalFilteredEarlyApplicant} removed`);
   console.log(`Duplicates:            ${totalDupes} skipped`);
   if (verify) {
     console.log(`Expired (verified):    ${expiredOffers.length} dropped`);

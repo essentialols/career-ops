@@ -70,6 +70,8 @@ function normalizeParserJob(job, entry) {
     url,
     company: String(job.company || entry.name || '').trim(),
     location: normalizeLocation(job.location || job.locations),
+    publishedAt: job.publishedAt || job.published_at || job.createdAt || job.created_at,
+    salary: job.salary || job.minSalary || job.min_salary,
   };
 }
 

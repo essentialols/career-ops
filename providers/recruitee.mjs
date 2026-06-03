@@ -99,6 +99,17 @@ export function parseRecruiteeResponse(json, companyName) {
       url,
       location,
       company: companyName,
+      publishedAt: j.createdAt,
+      salary: extractRecruiteesSalary(j.salary),
     };
   });
+}
+
+// Extract minimum salary from Recruitee's salary object.
+// Recruitee returns {min, max, currency}; we extract the minimum.
+// Returns undefined if no salary data is available.
+function extractRecruiteesSalary(salary) {
+  if (!salary || typeof salary !== 'object') return undefined;
+  if (salary.min && typeof salary.min === 'number') return salary.min;
+  return undefined;
 }

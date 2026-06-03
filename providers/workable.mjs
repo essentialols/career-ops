@@ -83,12 +83,14 @@ export function parseWorkableMarkdown(text, companyName) {
     const title = cols[1];
     if (!title || title === 'Title') continue;
     const location = cols[3] || '';
+    const salaryStr = cols[5] || '';
+    const postedStr = cols[6] || '';
     const urlMatch = line.match(/\[View\]\(([^)]+)\)/);
     let url = urlMatch ? urlMatch[1] : '';
     if (url.endsWith('.md')) url = url.slice(0, -3);
     if (!url) continue;  // skip rows with no resolvable URL (e.g., malformed [View] link)
 
-    // Validate the extracted URL — must parse as https://apply.workable.com/...
+    // Validate the extracted URL: must parse as https://apply.workable.com/...
     try {
       const parsedUrl = new URL(url);
       if (parsedUrl.protocol !== 'https:' || parsedUrl.hostname !== 'apply.workable.com') continue;
@@ -97,7 +99,39 @@ export function parseWorkableMarkdown(text, companyName) {
       continue;
     }
 
-    jobs.push({ title, url, location, company: companyName });
+    jobs.push({
+      title,
+      url,
+      location,
+      company: companyName,
+      salary: extractWorkableSalary(salaryStr),
+      publishedAt: parseWorkableDate(postedStr),
+    });
   }
   return jobs;
+}
+
+// Extract minimum salary from Workable's salary string (e.g. "$50k - $100k").
+// Returns undefined if the salary string cannot be parsed.
+function extractWorkableSalary(salaryStr) {
+  if (!salaryStr || typeof salaryStr !== 'string') return undefined;
+  const match = salaryStr.match(/[\$£€]?(\d+[.,]\d+|\d+)(?:[kK])?/);
+  if (!match) return undefined;
+  let num = parseFloat(match[1].replace(/[.,]/, '.'));
+  // Convert from thousands if the original had a 'k' suffix
+  if (salaryStr.match(/[\$£€]?\d+[kK]/)) num *= 1000;
+  return isNaN(num) ? undefined : num;
+}
+
+// Parse Workable's date string (e.g. "15 Jun 2025") to ISO format.
+// Returns undefined if the date cannot be parsed.
+function parseWorkableDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return undefined;
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return undefined;
+    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD
+  } catch {
+    return undefined;
+  }
 }

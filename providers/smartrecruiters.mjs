@@ -120,6 +120,22 @@ export function parseSmartRecruitersResponse(json, companyName) {
         url = `https://jobs.smartrecruiters.com/${companySlug}/${j.id}-${slugified}`;
       }
     }
-    return { title: j.name || '', url, location, company: companyName };
+    return {
+      title: j.name || '',
+      url,
+      location,
+      company: companyName,
+      publishedAt: j.createdDate,
+      salary: extractSmartRecruitersSalary(j.salary),
+    };
   });
+}
+
+// Extract minimum salary from SmartRecruiters' salary object.
+// SmartRecruiters returns {min, max, currency}; we extract the minimum.
+// Returns undefined if no salary data is available.
+function extractSmartRecruitersSalary(salary) {
+  if (!salary || typeof salary !== 'object') return undefined;
+  if (salary.min && typeof salary.min === 'number') return salary.min;
+  return undefined;
 }

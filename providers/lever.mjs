@@ -11,6 +11,15 @@ function resolveApiUrl(entry) {
   return `https://api.lever.co/v0/postings/${match[1]}`;
 }
 
+// Extract minimum salary from Lever's salary object.
+// Lever returns {start, mid, end, currency}; we extract the minimum.
+// Returns undefined if no salary data is available.
+function extractLeverSalary(salary) {
+  if (!salary || typeof salary !== 'object') return undefined;
+  if (salary.start && typeof salary.start === 'number') return salary.start;
+  return undefined;
+}
+
 /** @type {Provider} */
 export default {
   id: 'lever',
@@ -30,6 +39,11 @@ export default {
       url: j.hostedUrl || '',
       company: entry.name,
       location: j.categories?.location || '',
+      publishedAt: j.createdAt,
+      salary: extractLeverSalary(j.salary),
+      workplaceType: j.categories?.workplaceType || j.workplaceType || undefined,
+      employmentType: j.categories?.employmentType || j.employmentType || undefined,
+      description: j.description || undefined,
     }));
   },
 };
