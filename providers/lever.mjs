@@ -39,7 +39,7 @@ export default {
       url: j.hostedUrl || '',
       company: entry.name,
       location: j.categories?.location || '',
-      publishedAt: j.createdAt,
+      publishedAt: typeof j.createdAt === 'number' ? new Date(j.createdAt).toISOString() : undefined,
       salary: extractLeverSalary(j.salary),
       workplaceType: j.categories?.workplaceType || j.workplaceType || undefined,
       employmentType: j.categories?.employmentType || j.employmentType || undefined,

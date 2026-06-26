@@ -115,9 +115,11 @@ export function parseWorkableMarkdown(text, companyName) {
 // Returns undefined if the salary string cannot be parsed.
 function extractWorkableSalary(salaryStr) {
   if (!salaryStr || typeof salaryStr !== 'string') return undefined;
-  const match = salaryStr.match(/[\$£€]?(\d+[.,]\d+|\d+)(?:[kK])?/);
+  const match = salaryStr.match(/[\$£€]?((?:\d[\d,]*)(?:\.\d+)?)(?:[kK])?/);
   if (!match) return undefined;
-  let num = parseFloat(match[1].replace(/[.,]/, '.'));
+  // Strip thousands separators (commas) but keep the decimal point so that
+  // "$50,000" -> 50000 and "$50,000.50" -> 50000.50.
+  let num = parseFloat(match[1].replace(/,/g, ''));
   // Convert from thousands if the original had a 'k' suffix
   if (salaryStr.match(/[\$£€]?\d+[kK]/)) num *= 1000;
   return isNaN(num) ? undefined : num;
