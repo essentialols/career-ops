@@ -20,7 +20,7 @@ These files contain your personal data, customizations, and work product. Update
 | `data/follow-ups.md` | Your follow-up history |
 | `writing-samples/*` | Your personal writing samples for style calibration (except `writing-samples/README.md`, which is system-owned documentation delivered by updates) |
 | `reports/*` | Your evaluation reports |
-| `output/*` | Your generated PDFs |
+| `output/*` | Your output files |
 | `jds/*` | Your saved job descriptions |
 
 ## System Layer (safe to auto-update)
@@ -31,7 +31,6 @@ These files contain system logic, scripts, templates, and instructions that impr
 |------|---------|
 | `modes/_shared.md` | Scoring system, global rules, tools |
 | `modes/oferta.md` | Evaluation mode instructions |
-| `modes/pdf.md` | PDF generation instructions |
 | `modes/scan.md` | Portal scanner instructions |
 | `modes/batch.md` | Batch processing instructions |
 | `modes/apply.md` | Application assistant instructions |
@@ -57,7 +56,6 @@ These files contain system logic, scripts, templates, and instructions that impr
 | `batch/batch-runner.sh` | Batch orchestrator |
 | `dashboard/*` | Go TUI dashboard |
 | `templates/*` | Base templates |
-| `fonts/*` | Self-hosted fonts |
 | `.claude/skills/*` | Skill definitions |
 | `docs/*` | Documentation |
 | `VERSION` | Current version number |

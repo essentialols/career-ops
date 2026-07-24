@@ -44,7 +44,6 @@
 Career-Ops transforma qualquer CLI de código com IA em uma central completa de busca de emprego. Em vez de acompanhar candidaturas manualmente em planilha, você tem um pipeline com IA que:
 
 - **Avalia vagas** com um sistema estruturado de pontuação A-F (10 dimensões com pesos)
-- **Gera PDFs personalizados** -- CVs otimizados para ATS, ajustados por descrição de vaga
 - **Escaneia portais** automaticamente (Greenhouse, Ashby, Lever, páginas de empresas)
 - **Processa em lote** -- avalia 10+ vagas em paralelo com subagentes
 - **Rastreia tudo** em uma única fonte de verdade com verificações de integridade
@@ -61,11 +60,10 @@ Construído por alguém que usou isso para avaliar 740+ vagas, gerar 100+ CVs pe
 
 | Funcionalidade                       | Descrição                                                                                                                                      |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Auto-Pipeline**                    | Cole uma URL e receba avaliação completa + PDF + entrada no tracker                                                                            |
+| **Auto-Pipeline**                    | Cole uma URL e receba avaliação completa + entrada no tracker                                                                            |
 | **Avaliação em 6 blocos**            | Resumo da vaga, aderência ao CV, estratégia de senioridade, pesquisa de compensação, personalização, preparação para entrevista (STAR+R)       |
 | **Banco de histórias de entrevista** | Acumula histórias STAR+Reflection ao longo das avaliações -- 5-10 histórias principais que respondem qualquer pergunta comportamental          |
 | **Scripts de negociação**            | Frameworks para negociação salarial, resposta a desconto geográfico e alavanca com ofertas concorrentes                                        |
-| **Geração de PDF ATS**               | CVs com injeção de palavras-chave usando design com Space Grotesk + DM Sans                                                                    |
 | **Scanner de portais**               | 45+ empresas pré-configuradas (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + consultas customizadas em Ashby, Greenhouse, Lever e Wellfound |
 | **Processamento em lote**            | Avaliação paralela com workers `claude -p`                                                                                                     |
 | **Dashboard TUI**                    | Interface no terminal para navegar, filtrar e ordenar seu pipeline                                                                             |
@@ -78,7 +76,7 @@ Construído por alguém que usou isso para avaliar 740+ vagas, gerar 100+ CVs pe
 # 1. Clone e instale
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # Necessário para geração de PDF
+npx playwright install chromium   # Necessário para verificar se as vagas estão ativas (scan --verify)
 
 # 2. Verifique o setup
 npm run doctor                     # Valida todos os pré-requisitos
@@ -113,9 +111,8 @@ Career-ops é um único comando slash com múltiplos modos:
 
 ```
 /career-ops                → Mostrar todos os comandos disponíveis
-/career-ops {cole um JD}   → Auto-pipeline completo (avaliar + PDF + tracker)
+/career-ops {cole um JD}   → Auto-pipeline completo (avaliar + tracker)
 /career-ops scan           → Escanear portais por novas vagas
-/career-ops pdf            → Gerar CV otimizado para ATS
 /career-ops batch          → Avaliar múltiplas vagas em lote
 /career-ops tracker        → Ver status das candidaturas
 /career-ops apply          → Preencher formulários de candidatura com IA
@@ -189,12 +186,10 @@ career-ops/
 ├── modes/                       # 14 modos de skill
 │   ├── _shared.md               # Contexto compartilhado (personalize)
 │   ├── oferta.md                # Avaliação individual
-│   ├── pdf.md                   # Geração de PDF
 │   ├── scan.md                  # Scanner de portais
 │   ├── batch.md                 # Processamento em lote
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # Template de CV otimizado para ATS
 │   ├── portals.example.yml      # Template de configuração do scanner
 │   └── states.yml               # Status canônicos
 ├── batch/
@@ -203,8 +198,7 @@ career-ops/
 ├── dashboard/                   # Visualizador de pipeline em Go TUI
 ├── data/                        # Seus dados de rastreamento (gitignored)
 ├── reports/                     # Relatórios de avaliação (gitignored)
-├── output/                      # PDFs gerados (gitignored)
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # Arquivos de saída (gitignored)
 ├── docs/                        # Setup, customização, arquitetura
 └── examples/                    # CV de exemplo, relatório e proof points
 ```
@@ -218,7 +212,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **Agente**: Claude Code com skills e modos customizados
-- **PDF**: Playwright/Puppeteer + template HTML
 - **Scanner**: Playwright + Greenhouse API + WebSearch
 - **Dashboard**: Go + Bubble Tea + Lipgloss (tema Catppuccin Mocha)
 - **Dados**: Tabelas em Markdown + configuração YAML + arquivos TSV de lote

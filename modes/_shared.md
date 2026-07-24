@@ -95,15 +95,13 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 3. Submit applications on behalf of the candidate
 4. Share phone number in generated messages
 5. Recommend comp below market rate
-6. Generate a PDF without reading the JD first
-7. Use corporate-speak
-8. Ignore the tracker (every evaluated offer gets registered)
+6. Use corporate-speak
+7. Ignore the tracker (every evaluated offer gets registered)
 
 ### ALWAYS
 
-0. **Cover letter:** If the form allows it, ALWAYS include one. Same visual design as CV. JD quotes mapped to proof points. 1 page max.
+0. **Cover letter:** If the form allows it, ALWAYS include one. JD quotes mapped to proof points. 1 page max.
 1. Read cv.md, _profile.md, and article-digest.md (if exists) before evaluating
-1b. **First evaluation of each session:** Run `node cv-sync-check.mjs`. If warnings, notify user.
 2. Detect the role archetype and adapt framing per _profile.md
 3. Cite exact lines from CV when matching
 4. Use WebSearch for comp and company data
@@ -111,7 +109,6 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 6. Generate content in the language of the JD (EN default)
 7. Be direct and actionable -- no fluff
 8. Native tech English for generated text. Short sentences, action verbs, no passive voice.
-8b. Case study URLs in PDF Professional Summary (recruiter may only read this).
 9. **Tracker additions as TSV** -- NEVER edit applications.md directly. Write TSV in `batch/tracker-additions/`.
 10. **Include `**URL:**` in every report header.**
 
@@ -122,11 +119,10 @@ After detecting archetype, read `modes/_profile.md` for the user's specific fram
 | WebSearch | Comp research, trends, company culture, LinkedIn contacts, fallback for JDs |
 | WebFetch | Fallback for extracting JDs from static pages |
 | Playwright | Verify offers (browser_navigate + browser_snapshot). **NEVER 2+ agents with Playwright in parallel.** |
-| Read | cv.md, _profile.md, article-digest.md, cv-template.html |
-| Write | Temporary HTML for PDF, applications.md, reports .md |
+| Read | cv.md, _profile.md, article-digest.md |
+| Write | applications.md, reports .md |
 | Edit | Update tracker |
-| Canva MCP | Optional visual CV generation. Duplicate base design, edit text, export PDF. Requires `cv.canva_resume_design_id` in profile.yml. |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |
 
 ### Time-to-offer priority
 - Working demo + metrics > perfection
@@ -214,7 +210,7 @@ _Extracted from writing-samples/ on {date}. Re-run if new samples are added._
 
 ## Professional Writing & ATS Compatibility
 
-These rules apply to ALL generated text that ends up in candidate-facing documents: PDF summaries, bullets, cover letters, form answers, LinkedIn messages. They do NOT apply to internal evaluation reports.
+These rules apply to ALL generated text that ends up in candidate-facing documents: cover letters, form answers, LinkedIn messages. They do NOT apply to internal evaluation reports.
 
 ### Avoid cliché phrases
 - "passionate about" / "results-oriented" / "proven track record"
@@ -226,7 +222,7 @@ These rules apply to ALL generated text that ends up in candidate-facing documen
 - "demonstrated ability to" / "best practices" (name the practice)
 
 ### Unicode normalization for ATS
-`generate-pdf.mjs` automatically normalizes em-dashes, smart quotes, and zero-width characters to ASCII equivalents for maximum ATS compatibility. But avoid generating them in the first place.
+Avoid em-dashes, smart quotes, and zero-width characters in candidate-facing text. Prefer plain ASCII equivalents for maximum ATS compatibility.
 
 ### Vary sentence structure
 - Don't start every bullet with the same verb

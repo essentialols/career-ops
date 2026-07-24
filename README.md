@@ -50,14 +50,13 @@
 Career-Ops ([career-ops.org](https://career-ops.org), also known as **careerops**) turns any AI coding CLI into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
 
 - **Evaluates offers** with a structured A-F scoring system (10 weighted dimensions)
-- **Generates tailored PDFs** -- ATS-optimized CVs customized per job description
 - **Scans portals** automatically (Greenhouse, Ashby, Lever, company pages)
 - **Processes in batch** -- evaluate 10+ offers in parallel with sub-agents
 - **Tracks everything** in a single source of truth with integrity checks
 
 > **Important: This is NOT a spray-and-pray tool.** Career-ops is a filter -- it helps you find the few offers worth your time out of hundreds. The system strongly recommends against applying to anything scoring below 4.0/5. Your time is valuable, and so is the recruiter's. Always review before submitting.
 
-Career-ops is agentic: Claude Code navigates career pages with Playwright, evaluates fit by reasoning about your CV vs the job description (not keyword matching), and adapts your resume per listing.
+Career-ops is agentic: Claude Code navigates career pages with Playwright, and evaluates fit by reasoning about your CV vs the job description (not keyword matching). Resume tailoring itself lives in a separate LaTeX pipeline; career-ops focuses on evaluation, scanning, tracking, and interview prep.
 
 > **Heads up: the first evaluations won't be great.** The system doesn't know you yet. Feed it context -- your CV, your career story, your proof points, your preferences, what you're good at, what you want to avoid. The more you nurture it, the better it gets. Think of it as onboarding a new recruiter: the first week they need to learn about you, then they become invaluable.
 
@@ -67,11 +66,10 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 
 | Feature                  | Description                                                                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Auto-Pipeline**        | Paste a URL, get a full evaluation + PDF + tracker entry                                                                                 |
+| **Auto-Pipeline**        | Paste a URL, get a full evaluation + tracker entry                                                                                       |
 | **6-Block Evaluation**   | Role summary, CV match, level strategy, comp research, personalization, interview prep (STAR+R)                                          |
 | **Interview Story Bank** | Accumulates STAR+Reflection stories across evaluations -- 5-10 master stories that answer any behavioral question                        |
 | **Negotiation Scripts**  | Salary negotiation frameworks, geographic discount pushback, competing offer leverage                                                    |
-| **ATS PDF Generation**   | Keyword-injected CVs with Space Grotesk + DM Sans design                                                                                 |
 | **Portal Scanner**       | 45+ companies pre-configured (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + custom queries across Ashby, Greenhouse, Lever, Wellfound |
 | **Batch Processing**     | Parallel evaluation with `claude -p` workers                                                                                             |
 | **Dashboard TUI**        | Terminal UI to browse, filter, and sort your pipeline                                                                                    |
@@ -84,7 +82,7 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 # 1. Clone and install
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # Required for PDF generation
+npx playwright install chromium   # Required for offer liveness verification (scan --verify)
 
 # 2. Check setup
 npm run doctor                     # Validates all prerequisites
@@ -115,7 +113,7 @@ See [docs/SETUP.md](docs/SETUP.md) for the full setup guide.
 
 ## Gemini CLI Integration
 
-Career-ops supports [Gemini CLI](https://github.com/google-gemini/gemini-cli) natively — the same way it supports Claude Code and OpenCode. All 15 slash commands are available, using the same `modes/*.md` evaluation logic.
+Career-ops supports [Gemini CLI](https://github.com/google-gemini/gemini-cli) natively, the same way it supports Claude Code and OpenCode. All slash commands are available, using the same `modes/*.md` evaluation logic.
 
 ### Option A — Native Gemini CLI (Recommended)
 
@@ -135,11 +133,10 @@ gemini
 /career-ops "Senior AI Engineer at Anthropic..."
 /career-ops-evaluate --file ./jds/openai.txt
 /career-ops-scan
-/career-ops-pdf
 /career-ops-tracker
 ```
 
-The `GEMINI.md` file is auto-loaded as context. All 15 commands are defined in `.gemini/commands/*.toml`.
+The `GEMINI.md` file is auto-loaded as context. All commands are defined in `.gemini/commands/*.toml`.
 
 ### Option B — Standalone API Script (No CLI install needed)
 
@@ -165,9 +162,8 @@ Career-ops is a single slash command with multiple modes:
 
 ```
 /career-ops                → Show all available commands
-/career-ops {paste a JD}   → Full auto-pipeline (evaluate + PDF + tracker)
+/career-ops {paste a JD}   → Full auto-pipeline (evaluate + tracker)
 /career-ops scan           → Scan portals for new offers
-/career-ops pdf            → Generate ATS-optimized CV
 /career-ops batch          → Batch evaluate multiple offers
 /career-ops tracker        → View application status
 /career-ops apply          → Fill application forms with AI
@@ -196,10 +192,10 @@ You paste a job URL or description
 │  (reads cv.md)   │
 └────────┬─────────┘
          │
-    ┌────┼────┐
-    ▼    ▼    ▼
- Report  PDF  Tracker
-  .md   .pdf   .tsv
+    ┌────┴────┐
+    ▼         ▼
+ Report    Tracker
+  .md       .tsv
 ```
 
 ## Pre-configured Portals
@@ -247,15 +243,13 @@ career-ops/
 ├── article-digest.md            # Your proof points (optional)
 ├── config/
 │   └── profile.example.yml      # Template for your profile
-├── modes/                       # 14 skill modes
+├── modes/                       # skill modes
 │   ├── _shared.md               # Shared context (customize this)
 │   ├── oferta.md                # Single evaluation
-│   ├── pdf.md                   # PDF generation
 │   ├── scan.md                  # Portal scanner
 │   ├── batch.md                 # Batch processing
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # ATS-optimized CV template
 │   ├── portals.example.yml      # Scanner config template
 │   └── states.yml               # Canonical statuses
 ├── batch/
@@ -264,8 +258,7 @@ career-ops/
 ├── dashboard/                   # Go TUI pipeline viewer
 ├── data/                        # Your tracking data (gitignored)
 ├── reports/                     # Evaluation reports (gitignored)
-├── output/                      # Generated PDFs (gitignored)
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # Output files (gitignored)
 ├── docs/                        # Setup, customization, architecture
 └── examples/                    # Sample CV, report, proof points
 ```
@@ -279,7 +272,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **Agent**: Claude Code with custom skills and modes
-- **PDF**: Playwright/Puppeteer + HTML template
 - **Scanner**: Playwright + Greenhouse API + WebSearch
 - **Dashboard**: Go + Bubble Tea + Lipgloss (Catppuccin Mocha theme)
 - **Data**: Markdown tables + YAML config + TSV batch files

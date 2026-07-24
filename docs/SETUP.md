@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - [Claude Code](https://claude.ai/code) installed and configured
-- Node.js 18+ (for PDF generation and utility scripts)
+- Node.js 18+ (for the scanner and utility scripts)
 - (Optional) Go 1.21+ (for the dashboard TUI)
 
 ## Quick Start (5 steps)
@@ -14,7 +14,7 @@
 git clone https://github.com/santifer/career-ops.git
 cd career-ops
 npm install
-npx playwright install chromium   # Required for PDF generation
+npx playwright install chromium   # Required for offer liveness verification (scan --verify)
 ```
 
 ### 2. Configure your profile
@@ -27,7 +27,7 @@ Edit `config/profile.yml` with your personal details: name, email, target roles,
 
 ### 3. Add your CV
 
-Create `cv.md` in the project root with your full CV in markdown format. This is the source of truth for all evaluations and PDFs.
+Create `cv.md` in the project root with your full CV in markdown format. This is the candidate-background source of truth for all evaluations.
 
 (Optional) Create `article-digest.md` with proof points from your portfolio projects/articles.
 
@@ -50,7 +50,7 @@ Open Claude Code in this directory:
 claude
 ```
 
-Then paste a job offer URL or description. Career-ops will automatically evaluate it, generate a report, create a tailored PDF, and track it.
+Then paste a job offer URL or description. Career-ops will automatically evaluate it, generate a report, and track it.
 
 ## Available Commands
 
@@ -59,7 +59,6 @@ Then paste a job offer URL or description. Career-ops will automatically evaluat
 | Evaluate an offer | Paste a URL or JD text |
 | Search for offers | `/career-ops scan` |
 | Process pending URLs | `/career-ops pipeline` |
-| Generate a PDF | `/career-ops pdf` |
 | Batch evaluate | `/career-ops batch` |
 | Check tracker status | `/career-ops tracker` |
 | Fill application form | `/career-ops apply` |
@@ -67,7 +66,7 @@ Then paste a job offer URL or description. Career-ops will automatically evaluat
 ## Verify Setup
 
 ```bash
-node cv-sync-check.mjs      # Check configuration
+node doctor.mjs              # Check configuration
 node verify-pipeline.mjs     # Check pipeline integrity
 ```
 

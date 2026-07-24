@@ -48,7 +48,7 @@
 <!-- Replace with YOUR story. This frames everything. -->
 
 Use the candidate's exit story from `config/profile.yml` to frame ALL content:
-- **In PDF Summaries:** Bridge from past to future
+- **In cover-letter summaries:** Bridge from past to future
 - **In STAR stories:** Reference proof points from article-digest.md
 - **In Draft Answers:** The transition narrative appears in the first response
 

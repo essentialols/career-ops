@@ -179,9 +179,7 @@ Dans les offres et negociations francophones, certains termes n'existent pas sur
 ### TOUJOURS
 
 0. **Lettre de motivation :** Si le formulaire le permet, TOUJOURS en inclure une. PDF dans le meme design visuel que le CV. Citations de l'offre mappees sur les proof points. 1 page max.
-1. Lire `cv.md` et `article-digest.md` (si existant) avant d'evaluer une offre
-1b. **Premiere evaluation de chaque session :** Lancer `node cv-sync-check.mjs` via Bash. En cas d'alertes, prevenir le candidat
-2. Detecter l'archetype du role et adapter le framing
+1. Lire `cv.md` et `article-digest.md` (si existant) avant d'evaluer une offre2. Detecter l'archetype du role et adapter le framing
 3. Citer des lignes exactes du CV lors du matching
 4. Utiliser WebSearch pour les donnees de remuneration et d'entreprise
 5. Enregistrer dans le tracker apres chaque evaluation
@@ -199,7 +197,7 @@ Dans les offres et negociations francophones, certains termes n'existent pas sur
 | WebSearch | Recherche remuneration, tendances, culture d'entreprise, contacts LinkedIn, fallback offres |
 | WebFetch | Fallback pour extraire les offres depuis des pages statiques |
 | Playwright | Verifier si les offres sont actives (browser_navigate + browser_snapshot), extraire les offres depuis des SPAs. **CRITIQUE : JAMAIS 2+ agents en parallele avec Playwright -- ils partagent la meme instance navigateur** |
-| Read | cv.md, article-digest.md, cv-template.html |
+| Read | cv.md, article-digest.md |
 | Write | HTML temporaire pour PDF, applications.md, reports .md |
 | Edit | Mettre a jour le tracker |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |

@@ -198,9 +198,7 @@ skill はすべてのターゲット求人を同等の注意で扱う。プラ�
 ### 常にする
 
 0. **カバーレター：** フォームが添付または記入を許可する場合、必ず含める。履歴書と同じデザインの PDF。内容：JD の引用を proof point にマッピング、関連ケーススタディへのリンク。最大 1 ページ。
-1. 求人を評価する前に `cv.md`、`_profile.md`、`article-digest.md`（存在する場合）を読む
-1b. **各セッションの最初の評価で：** Bash で `node cv-sync-check.mjs` を実行。警告があれば続行前に候補者に知らせる
-2. 求人のアーキタイプを検出し、`_profile.md` に従ってフレーミングを適応させる
+1. 求人を評価する前に `cv.md`、`_profile.md`、`article-digest.md`（存在する場合）を読む2. 求人のアーキタイプを検出し、`_profile.md` に従ってフレーミングを適応させる
 3. マッチング時、履歴書の正確な行を引用する
 4. 報酬と企業データのために WebSearch を使う
 5. 各評価後に tracker に記録する
@@ -218,7 +216,7 @@ skill はすべてのターゲット求人を同等の注意で扱う。プラ�
 | WebSearch | 報酬調査、トレンド、企業カルチャー、LinkedIn コンタクト、求人記述のフォールバック |
 | WebFetch | 静的ページから求人記述を抽出するためのフォールバック |
 | Playwright | 求人がまだアクティブか検証（browser_navigate + browser_snapshot）、SPA からの記述抽出。**クリティカル：Playwright を使う 2 つ以上のエージェントを並列起動しない — 同じブラウザインスタンスを共有するため** |
-| Read | cv.md、_profile.md、article-digest.md、cv-template.html |
+| Read | cv.md、_profile.md、article-digest.md |
 | Write | PDF 用の一時 HTML、applications.md、reports .md |
 | Edit | tracker の更新 |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |

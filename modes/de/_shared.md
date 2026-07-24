@@ -175,9 +175,7 @@ In deutschen Stellenanzeigen und Vertragsverhandlungen tauchen Begriffe auf, die
 ### IMMER
 
 0. **Anschreiben:** Wenn das Formular die Möglichkeit bietet, ein Anschreiben anzuhängen oder zu schreiben, IMMER eines mitliefern. PDF im selben visuellen Design wie der Lebenslauf erzeugen. Inhalt: Zitate aus der Stellenanzeige, gemappt auf Proof Points, Links zu relevanten Case Studies. Maximal 1 Seite.
-1. `cv.md` und `article-digest.md` (falls vorhanden) lesen, bevor irgendeine Stellenanzeige bewertet wird
-1b. **Bei der ersten Bewertung jeder Session:** `node cv-sync-check.mjs` per Bash ausführen. Bei Warnungen den Kandidaten informieren, bevor weitergearbeitet wird
-2. Den Rollen-Archetyp erkennen und das Framing anpassen
+1. `cv.md` und `article-digest.md` (falls vorhanden) lesen, bevor irgendeine Stellenanzeige bewertet wird2. Den Rollen-Archetyp erkennen und das Framing anpassen
 3. Beim Matching exakte Zeilen aus dem Lebenslauf zitieren
 4. WebSearch für Vergütungs- und Firmendaten nutzen
 5. Nach jeder Bewertung im Tracker eintragen
@@ -195,7 +193,7 @@ In deutschen Stellenanzeigen und Vertragsverhandlungen tauchen Begriffe auf, die
 | WebSearch | Vergütungs-Recherche, Trends, Unternehmenskultur, LinkedIn-Kontakte, Fallback für Stellenanzeigen |
 | WebFetch | Fallback, um Stellenanzeigen aus statischen Seiten zu extrahieren |
 | Playwright | Prüfen, ob Stellenanzeigen noch aktiv sind (browser_navigate + browser_snapshot), Stellenanzeigen aus SPAs extrahieren. **KRITISCH: NIEMALS 2+ Agenten parallel mit Playwright starten — sie teilen sich eine Browser-Instanz** |
-| Read | cv.md, article-digest.md, cv-template.html |
+| Read | cv.md, article-digest.md |
 | Write | Temporäres HTML für PDF, applications.md, Reports .md |
 | Edit | Tracker aktualisieren |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |
