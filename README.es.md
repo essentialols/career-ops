@@ -45,7 +45,6 @@
 Career-Ops convierte cualquier CLI de IA en un centro de mando de busqueda de empleo. En vez de trackear aplicaciones en un spreadsheet, tienes un pipeline AI que:
 
 - **Evalua ofertas** con scoring estructurado A-F (10 dimensiones ponderadas)
-- **Genera PDFs personalizados** -- CVs ATS-optimizados por oferta
 - **Escanea portales** automaticamente (Greenhouse, Ashby, Lever, webs de empresas)
 - **Procesa en batch** -- evalua 10+ ofertas en paralelo con sub-agentes
 - **Trackea todo** en una fuente de verdad unica con checks de integridad
@@ -60,11 +59,10 @@ Construido por alguien que lo uso para evaluar 740+ ofertas, generar 100+ CVs pe
 
 | Feature                    | Descripcion                                                                                                                    |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Auto-Pipeline**          | Pega una URL, obtiene evaluacion + PDF + entrada en tracker                                                                    |
+| **Auto-Pipeline**          | Pega una URL, obtiene evaluacion + entrada en tracker                                                                    |
 | **Evaluacion A-F**         | Resumen del rol, match con CV, estrategia de nivel, research de comp, personalizacion, prep de entrevista (STAR+R)             |
 | **Banco de historias**     | Acumula historias STAR+Reflexion entre evaluaciones -- 5-10 historias maestras que responden cualquier pregunta behavioral     |
 | **Scripts de negociacion** | Frameworks de negociacion salarial, pushback de descuentos geograficos, leverage de ofertas competidoras                       |
-| **PDFs ATS**               | CVs con keywords inyectados, diseño Space Grotesk + DM Sans                                                                    |
 | **Scanner de portales**    | 45+ empresas pre-configuradas (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + queries en Ashby, Greenhouse, Lever, Wellfound |
 | **Batch**                  | Evaluacion en paralelo con workers `claude -p`                                                                                 |
 | **Dashboard TUI**          | Terminal UI para navegar, filtrar y ordenar tu pipeline                                                                        |
@@ -77,7 +75,7 @@ Construido por alguien que lo uso para evaluar 740+ ofertas, generar 100+ CVs pe
 # 1. Clonar e instalar
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # Necesario para generar PDFs
+npx playwright install chromium   # Necesario para verificar vigencia de ofertas (scan --verify)
 
 # 2. Verificar setup
 npm run doctor                     # Valida todos los prerequisitos
@@ -112,9 +110,8 @@ Career-ops es un unico slash command con multiples modos:
 
 ```
 /career-ops                → Mostrar todos los comandos
-/career-ops {pega un JD}   → Pipeline completo (evaluar + PDF + tracker)
+/career-ops {pega un JD}   → Pipeline completo (evaluar + tracker)
 /career-ops scan           → Escanear portales
-/career-ops pdf            → Generar CV ATS-optimizado
 /career-ops batch          → Evaluar ofertas en batch
 /career-ops tracker        → Ver estado de aplicaciones
 /career-ops apply          → Rellenar formularios con IA
@@ -187,12 +184,10 @@ career-ops/
 ├── modes/                       # 14 modos
 │   ├── _shared.md               # Contexto compartido (personalizable)
 │   ├── oferta.md                # Evaluacion individual
-│   ├── pdf.md                   # Generacion de PDF
 │   ├── scan.md                  # Scanner de portales
 │   ├── batch.md                 # Procesamiento batch
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # Template de CV ATS-optimizado
 │   ├── portals.example.yml      # Config del scanner
 │   └── states.yml               # Estados canonicos
 ├── batch/
@@ -201,8 +196,7 @@ career-ops/
 ├── dashboard/                   # Visor de pipeline en Go TUI
 ├── data/                        # Tus datos de tracking (gitignored)
 ├── reports/                     # Reports de evaluacion (gitignored)
-├── output/                      # PDFs generados (gitignored)
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # Archivos de salida (gitignored)
 ├── docs/                        # Setup, personalizacion, arquitectura
 └── examples/                    # CV de ejemplo, report, proof points
 ```
@@ -216,7 +210,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **Agente**: Claude Code con skills y modos personalizados
-- **PDF**: Playwright/Puppeteer + template HTML
 - **Scanner**: Playwright + Greenhouse API + WebSearch
 - **Dashboard**: Go + Bubble Tea + Lipgloss (tema Catppuccin Mocha)
 - **Datos**: Tablas Markdown + config YAML + ficheros TSV batch

@@ -11,10 +11,10 @@ Conductor (headed browser mode)
   │  Reads DOM directly — the user sees everything in real time
   │
   ├─ Job 1: reads JD from DOM + URL
-  │    └─► headless worker → report .md + PDF + tracker-line
+  │    └─► headless worker → report .md + tracker-line
   │
   ├─ Job 2: click next, read JD + URL
-  │    └─► headless worker → report .md + PDF + tracker-line
+  │    └─► headless worker → report .md + tracker-line
   │
   └─ End: merge tracker-additions → applications.md + summary
 ```
@@ -89,9 +89,8 @@ Each worker receives `batch-prompt.md` as a system prompt. It is self-contained.
 
 The worker produces:
 1. `.md` report in `reports/`
-2. PDF in `output/`
-3. Tracker line in `batch/tracker-additions/{id}.tsv`
-4. Result JSON via stdout
+2. Tracker line in `batch/tracker-additions/{id}.tsv`
+3. Result JSON via stdout
 
 ## Error handling
 
@@ -102,4 +101,3 @@ The worker produces:
 | Portal changes layout | Conductor reasons about HTML, adapts |
 | Worker crashes | Conductor marks `failed`, continues. Retry with `--retry-failed` |
 | Conductor crashes | Re-run → reads state → skip completed jobs |
-| PDF fails | .md report is saved. PDF remains pending |

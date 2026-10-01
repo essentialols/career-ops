@@ -48,7 +48,6 @@
 Career-Ops 可以把任何 AI 编码 CLI 变成完整的求职指挥中心。你不需要再手动用电子表格追踪申请流程，而是获得一个 AI 驱动的管道，能够：
 
 - **评估职位**，使用结构化的 A-F 评分系统（10 个加权维度）
-- **生成定制 PDF**，针对每份职位描述输出 ATS 优化简历
 - **自动扫描招聘平台**（Greenhouse、Ashby、Lever、公司招聘页）
 - **批量处理**，通过子代理并行评估 10 份以上职位
 - **集中管理一切**，用单一事实来源配合完整性检查
@@ -65,11 +64,10 @@ career-ops 具备代理式工作能力：Claude Code 会用 Playwright 浏览招
 
 | 功能 | 说明 |
 |------|------|
-| **自动管道** | 粘贴一个 URL，即可获得完整评估 + PDF + 追踪记录 |
+| **自动管道** | 粘贴一个 URL，即可获得完整评估 + 追踪记录 |
 | **6 个评估模块** | 职位总结、简历匹配、职级策略、薪酬调研、个性化建议、面试准备（STAR+R） |
 | **面试故事库** | 跨多次评估积累 STAR+Reflection 故事，沉淀出 5-10 个可回答任意行为面试题的主线故事 |
 | **谈薪脚本** | 薪资谈判框架、地域折扣反驳话术、竞品 offer 杠杆策略 |
-| **ATS PDF 生成** | 注入关键词的简历，采用 Space Grotesk + DM Sans 设计 |
 | **平台扫描器** | 预配置 45+ 家公司（Anthropic、OpenAI、ElevenLabs、Retool、n8n...），支持跨 Ashby、Greenhouse、Lever、Wellfound 的自定义查询 |
 | **批量处理** | 使用 `claude -p` worker 并行评估 |
 | **Dashboard TUI** | 在终端 UI 中浏览、筛选和排序你的求职管道 |
@@ -82,7 +80,7 @@ career-ops 具备代理式工作能力：Claude Code 会用 Playwright 浏览招
 # 1. 克隆并安装
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # 生成 PDF 所需
+npx playwright install chromium   # 用于职位有效性验证（scan --verify）
 
 # 2. 检查环境
 npm run doctor                     # 验证所有前置条件
@@ -133,7 +131,6 @@ gemini
 /career-ops "Anthropic 的资深 AI 工程师..."
 /career-ops-evaluate --file ./jds/openai.txt
 /career-ops-scan
-/career-ops-pdf
 /career-ops-tracker
 ```
 
@@ -164,9 +161,8 @@ career-ops 是一个单一斜杠命令，带有多种模式：
 
 ```
 /career-ops                → 显示所有可用命令
-/career-ops {粘贴职位描述}  → 完整自动管道（评估 + PDF + 追踪）
+/career-ops {粘贴职位描述}  → 完整自动管道（评估 + 追踪）
 /career-ops scan           → 扫描平台上的新职位
-/career-ops pdf            → 生成 ATS 优化简历
 /career-ops batch          → 批量评估多个职位
 /career-ops tracker        → 查看申请状态
 /career-ops apply          → 用 AI 协助填写申请表
@@ -239,12 +235,10 @@ career-ops/
 ├── modes/                       # 14 个技能模式
 │   ├── _shared.md               # 共享上下文（在这里自定义）
 │   ├── oferta.md                # 单个职位评估
-│   ├── pdf.md                   # PDF 生成
 │   ├── scan.md                  # 平台扫描器
 │   ├── batch.md                 # 批量处理
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # ATS 优化简历模板
 │   ├── portals.example.yml      # 扫描器配置模板
 │   └── states.yml               # 规范状态列表
 ├── batch/
@@ -253,8 +247,7 @@ career-ops/
 ├── dashboard/                   # Go TUI 管道查看器
 ├── data/                        # 你的追踪数据（已 gitignore）
 ├── reports/                     # 评估报告（已 gitignore）
-├── output/                      # 生成的 PDF（已 gitignore）
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # 输出文件（已 gitignore）
 ├── docs/                        # 配置、定制、架构说明
 └── examples/                    # 示例简历、报告、成果证明
 ```
@@ -268,7 +261,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **代理**：Claude Code，配合自定义技能与 modes
-- **PDF**：Playwright/Puppeteer + HTML 模板
 - **扫描器**：Playwright + Greenhouse API + WebSearch
 - **Dashboard**：Go + Bubble Tea + Lipgloss（Catppuccin Mocha 主题）
 - **数据**：Markdown 表格 + YAML 配置 + TSV 批处理文件

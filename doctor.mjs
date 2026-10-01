@@ -5,7 +5,7 @@
  * Checks all prerequisites and prints a pass/fail checklist.
  */
 
-import { existsSync, mkdirSync, readdirSync } from 'fs';
+import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -104,34 +104,6 @@ function checkPortals() {
   };
 }
 
-function checkFonts() {
-  const fontsDir = join(projectRoot, 'fonts');
-  if (!existsSync(fontsDir)) {
-    return {
-      pass: false,
-      label: 'fonts/ directory not found',
-      fix: 'The fonts/ directory is required for PDF generation',
-    };
-  }
-  try {
-    const files = readdirSync(fontsDir);
-    if (files.length === 0) {
-      return {
-        pass: false,
-        label: 'fonts/ directory is empty',
-        fix: 'The fonts/ directory must contain font files for PDF generation',
-      };
-    }
-  } catch {
-    return {
-      pass: false,
-      label: 'fonts/ directory not readable',
-      fix: 'Check permissions on the fonts/ directory',
-    };
-  }
-  return { pass: true, label: 'Fonts directory ready' };
-}
-
 function checkAutoDir(name) {
   const dirPath = join(projectRoot, name);
   if (existsSync(dirPath)) {
@@ -160,7 +132,6 @@ async function main() {
     checkCv(),
     checkProfile(),
     checkPortals(),
-    checkFonts(),
     checkAutoDir('data'),
     checkAutoDir('output'),
     checkAutoDir('reports'),

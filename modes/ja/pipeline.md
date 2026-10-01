@@ -9,7 +9,7 @@
    a. 次の `REPORT_NUM` を連番で計算（`reports/` を読み、最大番号 + 1）
    b. **JD を抽出** Playwright（browser_navigate + browser_snapshot）→ WebFetch → WebSearch の順で
    c. URL にアクセスできない場合 → `- [!]` にマークし注記、次へ進む
-   d. **完全な auto-pipeline を実行**：評価 A-F → Report .md → PDF（スコア >= 3.0 の場合）→ Tracker
+   d. **完全な auto-pipeline を実行**：評価 A-F → Report .md → Tracker
    e. **「未処理」から「処理済み」へ移動**：`- [x] #NNN | URL | 企業名 | 求人タイトル | スコア/5 | PDF ✅/❌`
 3. **3 つ以上の URL がある場合**、エージェントを並列起動（Agent tool の `run_in_background`）して速度を最大化。
 4. **完了後**、サマリーテーブルを表示：
@@ -53,13 +53,3 @@
 1. `reports/` 内のすべてのファイルをリスト
 2. プレフィックスから番号を抽出（例：`142-medispend...` → 142）
 3. 新番号 = 見つかった最大値 + 1
-
-## ソース同期
-
-URL を処理する前に同期を確認：
-
-```bash
-node cv-sync-check.mjs
-```
-
-非同期がある場合、続行前に候補者に通知。

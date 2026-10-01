@@ -47,7 +47,6 @@
 Career-Ops 能將任何 AI 程式碼 CLI 轉化為完整的求職指揮中心。不再需要手動用試算表追蹤應徵紀錄，而是獲得一個 AI 驅動的管道，能夠：
 
 - **評估職缺** — 結構化的 A-F 評分系統（10 個加權評估維度）
-- **生成客製化 PDF** — 針對每份職缺描述進行 ATS 最佳化的履歷
 - **自動掃描求職平台**（Greenhouse、Ashby、Lever、企業頁面）
 - **批次處理** — 透過子代理並行評估 10 份以上的職缺
 - **集中管理一切** — 單一資料來源，附完整性檢查
@@ -64,11 +63,10 @@ career-ops 具有代理能力：Claude Code 透過 Playwright 瀏覽求職頁面
 
 | 功能             | 說明                                                                                                                   |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **自動管道**     | 貼上 URL，自動完成評估 + PDF + 追蹤紀錄                                                                                |
+| **自動管道**     | 貼上 URL，自動完成評估 + 追蹤紀錄                                                                                |
 | **6 區塊評估**   | 職位摘要、履歷匹配、職級策略、薪酬調查、個人化、面試準備（STAR+R）                                                     |
 | **面試故事庫**   | 跨評估累積 STAR+Reflection 故事 — 能回答任何行為面試問題的 5-10 個核心故事                                             |
 | **薪資談判腳本** | 薪資談判框架、地區薪資折扣反駁話術、競爭 Offer 運用策略                                                                |
-| **ATS PDF 生成** | 注入關鍵字的履歷，採用 Space Grotesk + DM Sans 設計                                                                    |
 | **平台掃描器**   | 預設超過 45 家企業（Anthropic、OpenAI、ElevenLabs、Retool、n8n...）+ 跨 Ashby、Greenhouse、Lever、Wellfound 的自訂查詢 |
 | **批次處理**     | 使用 `claude -p` 工作器並行評估                                                                                        |
 | **儀表板 TUI**   | 在終端機 UI 中瀏覽、篩選及排序你的求職管道                                                                             |
@@ -81,7 +79,7 @@ career-ops 具有代理能力：Claude Code 透過 Playwright 瀏覽求職頁面
 # 1. 複製並安裝
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # PDF 生成所需
+npx playwright install chromium   # 用於職缺有效性驗證（scan --verify）
 
 # 2. 檢查設定
 npm run doctor                     # 驗證所有必要條件
@@ -116,9 +114,8 @@ career-ops 是一個具有多種模式的單一斜線指令：
 
 ```
 /career-ops                → 顯示所有可用指令
-/career-ops {貼上職缺描述}  → 完整自動管道（評估 + PDF + 追蹤）
+/career-ops {貼上職缺描述}  → 完整自動管道（評估 + 追蹤）
 /career-ops scan           → 掃描平台尋找新職缺
-/career-ops pdf            → 生成 ATS 最佳化履歷
 /career-ops batch          → 批次評估多份職缺
 /career-ops tracker        → 查看應徵狀態
 /career-ops apply          → AI 協助填寫應徵表單
@@ -192,12 +189,10 @@ career-ops/
 ├── modes/                       # 14 個技能模式
 │   ├── _shared.md               # 共用情境（在此自訂）
 │   ├── oferta.md                # 單一職缺評估
-│   ├── pdf.md                   # PDF 生成
 │   ├── scan.md                  # 平台掃描器
 │   ├── batch.md                 # 批次處理
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # ATS 最佳化履歷範本
 │   ├── portals.example.yml      # 掃描器設定範本
 │   └── states.yml               # 標準狀態清單
 ├── batch/
@@ -206,8 +201,7 @@ career-ops/
 ├── dashboard/                   # Go TUI 管道檢視器
 ├── data/                        # 你的追蹤資料（已 gitignore）
 ├── reports/                     # 評估報告（已 gitignore）
-├── output/                      # 生成的 PDF（已 gitignore）
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # 輸出檔案（已 gitignore）
 ├── docs/                        # 設定、自訂化、架構說明
 └── examples/                    # 範例履歷、報告、成就佐證
 ```
@@ -221,7 +215,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **代理**：Claude Code，附自訂技能與模式
-- **PDF**：Playwright/Puppeteer + HTML 範本
 - **掃描器**：Playwright + Greenhouse API + WebSearch
 - **儀表板**：Go + Bubble Tea + Lipgloss（Catppuccin Mocha 主題）
 - **資料**：Markdown 表格 + YAML 設定 + TSV 批次檔案

@@ -40,6 +40,15 @@ function buildSearchUrl(query) {
   if (query.time_posted) {
     params.set('f_TPR', query.time_posted);
   }
+  if (query.under_10) {
+    params.set('f_JIYN', 'true');
+  }
+  if (query.easy_apply) {
+    params.set('f_AL', 'true');
+  }
+  if (query.company_ids) {
+    params.set('f_C', query.company_ids);
+  }
 
   // Sorting
   params.set('sortBy', 'DD'); // date desc

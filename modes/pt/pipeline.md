@@ -9,7 +9,7 @@ Processa URLs de vagas acumuladas em `data/pipeline.md`. O candidato adiciona UR
    a. Calcular próximo `REPORT_NUM` sequencial (ler `reports/`, pegar o número mais alto + 1)
    b. **Extrair JD** usando Playwright (browser_navigate + browser_snapshot) → WebFetch → WebSearch
    c. Se a URL não for acessível → marcar como `- [!]` com nota e continuar
-   d. **Executar auto-pipeline completa**: Avaliação A-F → Report .md → PDF (se score >= 3.0) → Tracker
+   d. **Executar auto-pipeline completa**: Avaliação A-F → Report .md → Tracker
    e. **Mover de "Pendentes" para "Processadas"**: `- [x] #NNN | URL | Empresa | Vaga | Score/5 | PDF ✅/❌`
 3. **Se houver 3+ URLs pendentes**, lançar agentes em paralelo apenas para etapas sem Playwright (ex.: organização, WebSearch/WebFetch).
    Se a extração exigir Playwright, processar serialmente (1 vaga por vez) para evitar conflito de sessão.
@@ -53,13 +53,3 @@ Processa URLs de vagas acumuladas em `data/pipeline.md`. O candidato adiciona UR
 1. Listar todos os arquivos em `reports/`
 2. Extrair o número do prefixo (ex: `142-medispend...` → 142)
 3. Novo número = máximo encontrado + 1
-
-## Sincronização de fontes
-
-Antes de processar qualquer URL, verificar sincronização:
-
-```bash
-node cv-sync-check.mjs
-```
-
-Se houver dessincronização, avisar o candidato antes de continuar.

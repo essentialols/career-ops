@@ -192,9 +192,7 @@ Em vagas e negociações brasileiras, existem termos e práticas que não aparec
 ### SEMPRE
 
 0. **Carta de apresentação:** Se o formulário permite anexar ou escrever uma carta, SEMPRE inclua uma. PDF no mesmo design visual do currículo. Conteúdo: citações da descrição da vaga mapeadas para proof points, links para case studies relevantes. Máximo 1 página.
-1. Ler `cv.md`, `_profile.md` e `article-digest.md` (se existir) antes de avaliar qualquer vaga
-1b. **Na primeira avaliação de cada sessão:** Executar `node cv-sync-check.mjs` via Bash. Se houver avisos, informar o candidato antes de continuar
-2. Detectar o arquétipo da vaga e adaptar o framing conforme `_profile.md`
+1. Ler `cv.md`, `_profile.md` e `article-digest.md` (se existir) antes de avaliar qualquer vaga2. Detectar o arquétipo da vaga e adaptar o framing conforme `_profile.md`
 3. Ao fazer matching, citar linhas exatas do currículo
 4. Usar WebSearch para dados de remuneração e empresa
 5. Registrar no tracker após cada avaliação
@@ -212,7 +210,7 @@ Em vagas e negociações brasileiras, existem termos e práticas que não aparec
 | WebSearch | Pesquisa de remuneração, tendências, cultura da empresa, contatos LinkedIn, fallback para descrições de vagas |
 | WebFetch | Fallback para extrair descrições de vagas de páginas estáticas |
 | Playwright | Verificar se vagas ainda estão ativas (browser_navigate + browser_snapshot), extrair descrições de SPAs. **CRÍTICO: NUNCA iniciar 2+ agentes com Playwright em paralelo — eles compartilham a mesma instância do navegador** |
-| Read | cv.md, _profile.md, article-digest.md, cv-template.html |
+| Read | cv.md, _profile.md, article-digest.md |
 | Write | HTML temporário para PDF, reports .md, TSV em `batch/tracker-additions/` |
 | Edit | Ajustes de conteúdo (não usar para criar novos registros no tracker) |
-| Bash | `node generate-pdf.mjs`, `node merge-tracker.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |

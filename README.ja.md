@@ -44,7 +44,6 @@
 Career-Opsは、あらゆるAIコーディングCLIを本格的な求職コマンドセンターに変えます。スプレッドシートで応募を手動管理する代わりに、AIによる以下のパイプラインが手に入ります:
 
 - **オファーを評価** -- 構造化されたA-Fスコアリングシステム（10項目の重み付け評価軸）
-- **テーラーメイドPDFを生成** -- 各求人票に合わせてATS最適化されたCV
 - **求人ポータルを自動スキャン** （Greenhouse、Ashby、Lever、企業ページ）
 - **バッチ処理** -- サブエージェントで10件以上のオファーを並列評価
 - **すべてを一元管理** -- 整合性チェック付きの単一のデータソース
@@ -61,11 +60,10 @@ career-opsはエージェンティックです: Claude CodeがPlaywrightで求�
 
 | 機能                     | 説明                                                                                                                             |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| **自動パイプライン**     | URLを貼るだけで、評価 + PDF + トラッカー記録が完了                                                                               |
+| **自動パイプライン**     | URLを貼るだけで、評価 + トラッカー記録が完了                                                                               |
 | **6ブロック評価**        | 役割サマリー、CVマッチ、レベル戦略、報酬調査、パーソナライズ、面接準備（STAR+R）                                                 |
 | **面接ストーリーバンク** | 評価を重ねるごとにSTAR+Reflectionストーリーを蓄積 -- あらゆる行動面接質問に答える5〜10のマスターストーリー                       |
 | **交渉スクリプト**       | 給与交渉のフレームワーク、地域ディスカウント反論、競合オファーの活用                                                             |
-| **ATS向けPDF生成**       | Space Grotesk + DM Sansデザインのキーワード注入型CV                                                                              |
 | **ポータルスキャナー**   | 45社以上事前設定済み（Anthropic、OpenAI、ElevenLabs、Retool、n8n...) + Ashby、Greenhouse、Lever、Wellfound横断のカスタムクエリ   |
 | **バッチ処理**           | `claude -p`ワーカーによる並列評価                                                                                                |
 | **ダッシュボードTUI**    | パイプラインを閲覧・フィルター・ソートするターミナルUI                                                                           |
@@ -78,7 +76,7 @@ career-opsはエージェンティックです: Claude CodeがPlaywrightで求�
 # 1. クローンとインストール
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # PDF生成に必要
+npx playwright install chromium   # 求人の掲載継続確認（scan --verify）に必要
 
 # 2. セットアップ確認
 npm run doctor                     # 前提条件をすべて検証
@@ -113,9 +111,8 @@ career-opsは複数のモードを持つ単一のスラッシュコマンドで�
 
 ```
 /career-ops                → 利用可能なすべてのコマンドを表示
-/career-ops {求人票を貼る}  → 完全自動パイプライン（評価 + PDF + トラッカー）
+/career-ops {求人票を貼る}  → 完全自動パイプライン（評価 + トラッカー）
 /career-ops scan           → ポータルをスキャンして新しい求人を探す
-/career-ops pdf            → ATS最適化CVを生成
 /career-ops batch          → 複数オファーをバッチ評価
 /career-ops tracker        → 応募ステータスを表示
 /career-ops apply          → AIで応募フォームを入力
@@ -189,12 +186,10 @@ career-ops/
 ├── modes/                       # 14個のスキルモード
 │   ├── _shared.md               # 共有コンテキスト（ここをカスタマイズ）
 │   ├── oferta.md                # 単一オファー評価
-│   ├── pdf.md                   # PDF生成
 │   ├── scan.md                  # ポータルスキャナー
 │   ├── batch.md                 # バッチ処理
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # ATS最適化CVテンプレート
 │   ├── portals.example.yml      # スキャナー設定テンプレート
 │   └── states.yml               # 正規ステータス
 ├── batch/
@@ -203,8 +198,7 @@ career-ops/
 ├── dashboard/                   # Go製TUIパイプラインビューア
 ├── data/                        # 追跡データ（gitignore対象）
 ├── reports/                     # 評価レポート（gitignore対象）
-├── output/                      # 生成PDF（gitignore対象）
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # 出力ファイル（gitignore対象）
 ├── docs/                        # セットアップ、カスタマイズ、アーキテクチャ
 └── examples/                    # サンプルCV、レポート、実績の裏付け
 ```
@@ -218,7 +212,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **エージェント**: Claude Code（カスタムスキルとモード付き）
-- **PDF**: Playwright/Puppeteer + HTMLテンプレート
 - **スキャナー**: Playwright + Greenhouse API + WebSearch
 - **ダッシュボード**: Go + Bubble Tea + Lipgloss（Catppuccin Mochaテーマ）
 - **データ**: Markdownテーブル + YAML設定 + TSVバッチファイル

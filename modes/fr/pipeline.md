@@ -9,7 +9,7 @@ Traite les URLs d'offres accumulees dans `data/pipeline.md`. Le candidat ajoute 
    a. Calculer le prochain `REPORT_NUM` sequentiel (lire `reports/`, prendre le numero le plus eleve + 1)
    b. **Extraire l'offre** avec Playwright (`browser_navigate` + `browser_snapshot`) -> WebFetch -> WebSearch
    c. Si l'URL n'est pas accessible -> marquer comme `- [!]` avec une note et continuer
-   d. **Executer l'auto-pipeline complet** : Evaluation A-F -> Report .md -> PDF (si score >= 3.0) -> Tracker
+   d. **Executer l'auto-pipeline complet** : Evaluation A-F -> Report .md -> Tracker
    e. **Deplacer de "En attente" vers "Traitees"** : `- [x] #NNN | URL | Entreprise | Role | Score/5 | PDF oui/non`
 3. **Si 3+ URLs en attente**, lancer des agents en parallele (Agent tool avec `run_in_background`) pour maximiser la vitesse.
 4. **A la fin**, afficher un tableau recapitulatif :
@@ -51,13 +51,3 @@ Traite les URLs d'offres accumulees dans `data/pipeline.md`. Le candidat ajoute 
 1. Lister tous les fichiers dans `reports/`
 2. Extraire le numero du prefixe (ex : `142-medispend...` -> 142)
 3. Nouveau numero = maximum trouve + 1
-
-## Synchronisation des sources
-
-Avant de traiter une URL, verifier la sync :
-
-```bash
-node cv-sync-check.mjs
-```
-
-En cas de desynchronisation, alerter le candidat avant de continuer.

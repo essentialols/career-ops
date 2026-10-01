@@ -9,7 +9,7 @@ Verarbeitet URLs von Stellenanzeigen, die in `data/pipeline.md` gesammelt wurden
    a. Nächste fortlaufende `REPORT_NUM` berechnen (in `reports/` lesen, höchste Nummer + 1)
    b. **Stellenanzeige extrahieren** mit Playwright (`browser_navigate` + `browser_snapshot`) → WebFetch → WebSearch
    c. Wenn die URL nicht erreichbar ist → als `- [!]` mit Notiz markieren und weitermachen
-   d. **Vollständige Auto-Pipeline ausführen**: A-F-Bewertung → Report .md → PDF (wenn Score >= 3.0) → Tracker
+   d. **Vollständige Auto-Pipeline ausführen**: A-F-Bewertung → Report .md → Tracker
    e. **Von "Offen" nach "Verarbeitet" verschieben**: `- [x] #NNN | URL | Firma | Rolle | Score/5 | PDF ✅/❌`
 3. **Bei 3+ offenen URLs** Agenten parallel starten (Agent-Tool mit `run_in_background`), um Tempo zu machen.
 4. **Am Ende** eine Zusammenfassungstabelle ausgeben:
@@ -51,13 +51,3 @@ Verarbeitet URLs von Stellenanzeigen, die in `data/pipeline.md` gesammelt wurden
 1. Alle Dateien in `reports/` listen
 2. Aus dem Präfix die Nummer extrahieren (z. B. `142-medispend...` → 142)
 3. Neue Nummer = höchste gefundene + 1
-
-## Synchronisierung der Quellen
-
-Vor dem Verarbeiten irgendeiner URL die Sync prüfen:
-
-```bash
-node cv-sync-check.mjs
-```
-
-Bei Abweichungen den Kandidaten warnen, bevor weitergearbeitet wird.

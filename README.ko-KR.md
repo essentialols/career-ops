@@ -45,7 +45,6 @@
 Career-Ops는 AI 코딩 CLI를 취업 활동 전체를 관리하는 커맨드 센터로 바꿔줍니다. 스프레드시트에서 수동으로 지원 현황을 관리하는 대신, AI 파이프라인이 알아서 처리합니다:
 
 - **공고 평가** -- 구조화된 A-F 스코어링 (10개 가중 평가 항목)
-- **맞춤형 PDF 생성** -- JD별로 최적화된 ATS 이력서
 - **포털 자동 스캔** -- Greenhouse, Ashby, Lever, 기업 채용 페이지
 - **일괄 처리** -- 서브 에이전트로 10개 이상의 공고를 병렬 평가
 - **통합 추적** -- 무결성 검사가 포함된 단일 데이터 소스
@@ -62,11 +61,10 @@ Career-ops는 에이전트 기반으로 작동합니다: Claude Code가 Playwrig
 
 | 기능                   | 설명                                                                                                                                |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **자동 파이프라인**    | URL 입력만으로 [평가 → PDF 생성 → 트래커 등록] 전 과정 자동화                                                                       |
+| **자동 파이프라인**    | URL 입력만으로 [평가 → 트래커 등록] 전 과정 자동화                                                                       |
 | **6단계 정밀 평가**    | 직무 요약, 이력서 매치, 레벨링 전략, 연봉 리서치, 개인화, 면접 준비 (STAR+R)                                                        |
 | **면접 스토리 뱅크**   | 평가 데이터 기반 STAR+Reflection 스토리 축적 -- 어떤 행동 면접 질문도 커버하는 5~10개의 마스터 답변 생성                            |
 | **협상 전략 스크립트** | 연봉 협상 프레임워크, 거주지 기반 연봉 차등(Geographic Discount) 대응 논리, 경쟁 오퍼 활용 전략                                     |
-| **ATS PDF 생성**       | Space Grotesk + DM Sans 디자인, 키워드가 주입된 이력서                                                                              |
 | **포털 스캐너**        | 45개 이상의 기업 사전 설정 (Anthropic, OpenAI, ElevenLabs, Retool, n8n 등) + Ashby, Greenhouse, Lever, Wellfound 전반의 커스텀 검색 |
 | **일괄 처리**          | `claude -p` 워커로 병렬 평가                                                                                                        |
 | **Dashboard TUI**      | 터미널 UI에서 파이프라인 탐색, 필터링, 정렬                                                                                         |
@@ -79,7 +77,7 @@ Career-ops는 에이전트 기반으로 작동합니다: Claude Code가 Playwrig
 # 1. 클론 및 설치
 git clone https://github.com/santifer/career-ops.git
 cd career-ops && npm install
-npx playwright install chromium   # PDF 렌더링을 위한 브라우저 엔진 설치
+npx playwright install chromium   # 공고 활성 여부 확인(scan --verify)에 필요
 
 # 2. 설정 확인
 npm run doctor                     # 모든 사전 요구사항 및 환경 변수 검증
@@ -114,9 +112,8 @@ Career-ops는 다양한 모드를 가진 하나의 슬래시 커맨드입니다:
 
 ```
 /career-ops                → 사용 가능한 모든 명령어 표시
-/career-ops {JD 붙여넣기}  → 전체 자동 파이프라인 (평가 + PDF + 트래커)
+/career-ops {JD 붙여넣기}  → 전체 자동 파이프라인 (평가 + 트래커)
 /career-ops scan           → 포털에서 새 공고 스캔
-/career-ops pdf            → ATS 최적화 이력서 생성
 /career-ops batch          → 여러 공고 일괄 평가
 /career-ops tracker        → 지원 현황 확인
 /career-ops apply          → AI로 지원서 양식 작성
@@ -189,12 +186,10 @@ career-ops/
 ├── modes/                       # 14개 스킬 모드
 │   ├── _shared.md               # 공유 컨텍스트 (커스터마이즈 가능)
 │   ├── oferta.md                # 개별 평가
-│   ├── pdf.md                   # PDF 생성
 │   ├── scan.md                  # 포털 스캐너
 │   ├── batch.md                 # 일괄 처리
 │   └── ...
 ├── templates/
-│   ├── cv-template.html         # ATS 최적화 이력서 템플릿
 │   ├── portals.example.yml      # 스캐너 설정 템플릿
 │   └── states.yml               # 정규 상태값
 ├── batch/
@@ -203,8 +198,7 @@ career-ops/
 ├── dashboard/                   # Go TUI 파이프라인 뷰어
 ├── data/                        # 트래킹 데이터 (gitignored)
 ├── reports/                     # 평가 리포트 (gitignored)
-├── output/                      # 생성된 PDF (gitignored)
-├── fonts/                       # Space Grotesk + DM Sans
+├── output/                      # 출력 파일 (gitignored)
 ├── docs/                        # 설정, 커스터마이즈, 아키텍처
 └── examples/                    # 예시 이력서, 리포트, 성과
 ```
@@ -218,7 +212,6 @@ career-ops/
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
 - **에이전트**: Claude Code + 커스텀 스킬 및 모드
-- **PDF**: Playwright/Puppeteer + HTML 템플릿
 - **스캐너**: Playwright + Greenhouse API + WebSearch
 - **대시보드**: Go + Bubble Tea + Lipgloss (Catppuccin Mocha 테마)
 - **데이터**: Markdown 테이블 + YAML 설정 + TSV 배치 파일

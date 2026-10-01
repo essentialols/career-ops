@@ -221,9 +221,7 @@ Türkçe iş ilanlarında ve sözleşme müzakerelerinde, yabancı piyasalarda k
 ### HER ZAMAN
 
 0. **Ön yazı:** Form izin veriyorsa HER ZAMAN ön yazı ekle. CV ile aynı görsel tasarımda PDF olarak üret. İçerik: ilandan doğrudan alıntılar + kanıt noktalarıyla eşleştirme. Maksimum 1 sayfa.
-1. Herhangi bir ilanı değerlendirmeden önce `cv.md` ve `article-digest.md` dosyalarını oku (varsa)
-1b. **Her oturumun ilk değerlendirmesinde:** `node cv-sync-check.mjs` çalıştır. Uyarı varsa adayı bilgilendirmeden devam etme
-2. Rol arketipini belirle ve çerçevelemeyi buna göre uyarla
+1. Herhangi bir ilanı değerlendirmeden önce `cv.md` ve `article-digest.md` dosyalarını oku (varsa)2. Rol arketipini belirle ve çerçevelemeyi buna göre uyarla
 3. CV eşleştirmesinde dosyadan tam satır alıntıla
 4. Maaş ve şirket bilgisi için WebSearch kullan
 5. Değerlendirmeden sonra takipçiye kaydet
@@ -241,11 +239,10 @@ Türkçe iş ilanlarında ve sözleşme müzakerelerinde, yabancı piyasalarda k
 | WebSearch | Maaş araştırması, şirket kültürü, Kariyer.net/LinkedIn ilanları, Türk şirket haberleri |
 | WebFetch | Statik sayfalardan ilan içeriği çekme |
 | Playwright | İlan doğrulama (browser_navigate + browser_snapshot). **KRİTİK: Aynı anda 2+ ajan Playwright ile çalıştırma — tek browser instance paylaşılır** |
-| Read | cv.md, _profile.md, article-digest.md, cv-template.html |
+| Read | cv.md, _profile.md, article-digest.md |
 | Write | PDF için geçici HTML, rapor .md dosyaları, `batch/tracker-additions/*.tsv` (yeni takipçi girişleri) |
 | Edit | `data/applications.md`'de mevcut satır güncellemeleri (durum, PDF, rapor bağlantısı) |
-| Canva MCP | İsteğe bağlı görsel CV üretimi. Temel tasarımı çoğalt, metni düzenle, PDF olarak dışa aktar. `profile.yml`'de `canva_resume_design_id` gerektirir. |
-| Bash | `node generate-pdf.mjs` |
+| Bash | `node merge-tracker.mjs`, `node verify-pipeline.mjs`, `node scan.mjs` |
 
 ---
 
@@ -263,7 +260,7 @@ Bu kurallar adaya giden tüm üretilmiş metinler için geçerlidir: PDF özetle
 - "kanıtlanmış yetenek" / "en iyi uygulamalar" → spesifik uygulamayı adlandır
 
 ### ATS için Unicode normalleştirme
-`generate-pdf.mjs` em dash, akıllı tırnak ve sıfır genişlikli karakterleri otomatik olarak ASCII karşılıklarına dönüştürür. Yine de en başından üretmekten kaçın.
+Adaya giden metinlerde em dash, akıllı tırnak ve sıfır genişlikli karakterlerden kaçın. Maksimum ATS uyumluluğu için düz ASCII karşılıklarını tercih et.
 
 ### Cümle yapısını çeşitlendir
 - Her maddeye aynı fiille başlama

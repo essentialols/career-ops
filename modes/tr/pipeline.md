@@ -9,7 +9,7 @@
    a. Sıradaki rapor numarasını hesapla (`reports/` klasörüne bak, en büyük numara + 1)
    b. **İlan içeriğini çek:** Playwright (browser_navigate + browser_snapshot) → WebFetch → WebSearch. **Playwright kullanılmadıysa** (toplu/headless mod veya yedek yola düşüldüyse) rapor başlığına `**Doğrulama:** doğrulanmamış (toplu mod)` etiketini ekle.
    c. URL erişilemiyorsa → `- [!]` olarak işaretle, not ekle ve bir sonrakine geç
-   d. **Tam pipeline'ı çalıştır:** A-G değerlendirmesi → Rapor (.md) → PDF (puan ≥ 3,0 ise) → Takipçi
+   d. **Tam pipeline'ı çalıştır:** A-G değerlendirmesi → Rapor (.md) → Takipçi
    e. **"Bekleyenler"den "İşlenenler"e taşı:** `- [x] #NNN | URL | Şirket | Rol | Puan/5 | PDF ✅/❌`
 3. **3 veya daha fazla URL varsa ve Playwright kullanılmıyorsa** paralel ajan başlat (Agent aracı, `run_in_background`) — hızı artırır. Playwright etkinse tek tarayıcı örneği paylaşıldığından sıralı işle.
 4. **Tamamlanınca** özet tabloyu göster:
@@ -51,11 +51,3 @@
 1. `reports/` klasöründeki tüm dosyaları listele
 2. Dosya adı önekinden numarayı çıkar (örn. `142-trendyol-backend...` → 142)
 3. Yeni numara = bulunan en büyük numara + 1
-
-## Başlamadan Önce
-
-Herhangi bir URL'yi işlemeden önce yapılandırma kontrolü çalıştır:
-```bash
-node cv-sync-check.mjs
-```
-Uyarı varsa adayı bilgilendirmeden devam etme.

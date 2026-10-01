@@ -10,9 +10,9 @@
    b. **🚦 Playwright verification gate (обов'язково):** `browser_navigate` → `browser_snapshot`. Визначити: title + description + Apply button = active; тільки footer/navbar без JD = closed/inactive. **Якщо inactive** → позначити `- [!] URL — Вакансія закрита/неактивна`, пропустити цей URL, перейти до наступного.
    c. **Витягти JD** з того ж Playwright snapshot (або WebFetch/WebSearch як fallback, якщо Playwright вже підтвердив активність)
    d. Якщо URL недоступний (login wall, 404, timeout) → позначити `- [!]` з приміткою, продовжити
-   e. **Виконати auto-pipeline**: Оцінка A-F → Звіт .md → PDF (якщо бал >= 3.0) → Трекер
+   e. **Виконати auto-pipeline**: Оцінка A-F → Звіт .md → Трекер
    f. **Перемістити з "Очікуючі" в "Оброблені"**: `- [x] #NNN | URL | Компанія | Роль | Бал/5 | PDF ✅/❌`
-3. **Якщо 3+ URL**, паралелізація з Agent tool (`run_in_background`). **Обмеження:** тільки **один** Playwright-агент одночасно (правило `_shared.md`). Рекомендована схема: один агент послідовно проходить verification gate для кожного URL через Playwright; після підтвердження активності — запускає окремих агентів для evaluation/report/PDF (WebFetch, оцінка, генерація звіту паралельно). Жоден агент не починає evaluation, поки Playwright gate не підтвердив, що вакансія активна.
+3. **Якщо 3+ URL**, паралелізація з Agent tool (`run_in_background`). **Обмеження:** тільки **один** Playwright-агент одночасно (правило `_shared.md`). Рекомендована схема: один агент послідовно проходить verification gate для кожного URL через Playwright; після підтвердження активності — запускає окремих агентів для evaluation/report (WebFetch, оцінка, генерація звіту паралельно). Жоден агент не починає evaluation, поки Playwright gate не підтвердив, що вакансія активна.
 4. **По завершенні** показати таблицю:
 
 ```
@@ -53,13 +53,3 @@
 1. Список файлів у `reports/`
 2. Витягти номер з префікса
 3. Новий номер = максимум + 1
-
-## Синхронізація джерел
-
-Перед обробкою URL:
-
-```bash
-node cv-sync-check.mjs
-```
-
-Якщо розсинхронізація — попередити користувача.
